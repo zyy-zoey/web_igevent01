@@ -2,10 +2,26 @@
 // 会先调用 ajaxPrefiler 这个函数
 // 在这个函数中，可以拿到我们给ajax提供的配置对象
 // 请求拦截器
-// 语法 ： $.ajaxPrefilter( [ dataType ,] handler )
-//dataType : 一个或多个用空格隔开的数据类型所组成的字符串。
-//handler--用于预处理参数选项的回调函数。它有以下3个参数：
-// options：(Object对象)当前AJAX请求的所有参数选项。
-$.ajaxPrefiler((option) => {
-  option.url = `http://www.liulongbin.top:3007` + option.url;
+$.ajaxPrefilter((options) => {
+  options.url = `http://www.liulongbin.top:3007` + options.url;
+  // 再请求之前给有权限的接口注入 token
+  // console.log(options.url.includes("/my/"));
+  if (options.url.includes("/my/")) {
+    options.headers = {
+      Authorization: localStorage.getItem("token"),
+    };
+  }
+
+  // 统一处理权限问题
+  options.complete = (res) => {
+    // console.log(res);
+    if (
+      res.responseJSON.status === 1 &&
+      res.responseJSON.message === "身份认证失败！"
+    ) {
+      // 清空
+      localStorage.removeItem("token");
+      location.href = "/login.html";
+    }
+  };
 });
