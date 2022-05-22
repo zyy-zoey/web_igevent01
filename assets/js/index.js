@@ -57,3 +57,6 @@ const randerAvatar = (user) => {
     $(".text-avatar").html(firstName).show();
   }
 };
+function change() {
+  $("#art_list").addClass("layui-this").next().removeClass("layui-this");
+}
